@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gimkit Spawner</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        input, button { margin: 0.5rem 0; padding: 0.5rem; width: 100%; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #output { margin-top: 1rem; white-space: pre-wrap; background: #f4f4f4; padding: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>Gimkit Bot Spawner</h1>
+    <input type="text" id="roomId" placeholder="Gimkit Room Code" required>
+    <input type="text" id="name" placeholder="Bot Name (optional)">
+    <input type="number" id="amount" placeholder="Amount (1-60)" value="5" min="1" max="60">
+    <button id="spawnBtn">Spawn Bots</button>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('spawnBtn').addEventListener('click', async () => {
+            const roomId = document.getElementById('roomId').value;
+            const name = document.getElementById('name').value || 'Bot';
+            const amount = document.getElementById('amount').value;
+
+            if (!roomId) return alert("Please enter a room code.");
+
+            const output = document.getElementById('output');
+            output.textContent = "Spawning...";
+
+            try {
+                const response = await fetch('/spawn', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId, name, amount })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    output.textContent = JSON.stringify(data.results, null, 2);
+                } else {
+                    output.textContent = "Error: " + JSON.stringify(data);
+                }
+            } catch (err) {
+                output.textContent = "Connection failed.";
+            }
+        });
+    </script>
+</body>
+</html>
